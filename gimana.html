@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gimana Hari Ini?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #1a237e 0%, #1565c0 50%, #0288d1 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #music-btn {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      color: white;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      transition: background .2s, transform .15s;
+      z-index: 999;
+    }
+    #music-btn:hover { background: rgba(255,255,255,0.35); transform: scale(1.1); }
+
+    .card {
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(16px);
+      border-radius: 32px;
+      padding: 40px 32px;
+      max-width: 440px;
+      width: 92%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .scene { display: none; }
+    .scene.active { display: block; animation: fadeIn 0.45s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    .title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .subtitle {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+    .fixed-question {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .btn-group { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px; }
+    .btn {
+      padding: 14px 30px;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all .2s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .btn:hover  { transform: scale(1.08) translateY(-2px); }
+    .btn:active { transform: scale(0.95); }
+    .btn-yes  { background: linear-gradient(135deg,#43e97b,#38f9d7); color: #1a237e; }
+    .btn-no   { background: linear-gradient(135deg,#fa709a,#fee140); color: #1a237e; }
+    .btn-send { background: linear-gradient(135deg,#4facfe,#00f2fe); color: #1a237e; font-size:1.05rem; padding:15px 40px; }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      padding: 16px;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 8px;
+      transition: border .2s;
+    }
+    textarea::placeholder { color: rgba(255,255,255,0.5); }
+    textarea:focus { border-color: rgba(255,255,255,0.7); }
+
+    input[type="text"] {
+      width: 100%;
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      padding: 14px 18px;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border .2s;
+    }
+    input[type="text"]::placeholder { color: rgba(255,255,255,0.5); }
+    input[type="text"]:focus { border-color: rgba(255,255,255,0.7); }
+
+    .emoji-big { font-size: 3rem; margin-bottom: 12px; display: block; }
+
+    .status-msg {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<button id="music-btn" onclick="toggleMusic()" title="Play/pause musik">🎵</button>
+
+<!-- Ganti musik.mp3 dengan nama file musikmu yang di-upload ke repo GitHub -->
+<audio id="bgMusic" loop>
+  <source src="bahan.mp3" type="audio/mpeg"/>
+</audio>
+
+<div class="card">
+
+  <div class="scene active" id="scene1">
+    <span class="emoji-big">🌤️</span>
+    <div class="title">gimana hari ini?</div>
+    <div class="btn-group">
+      <button class="btn btn-yes" onclick="goTo('scene_baik')">baik 😊</button>
+      <button class="btn btn-no"  onclick="goTo('scene_engga')">engga 😔</button>
+    </div>
+  </div>
+
+  <div class="scene" id="scene_baik">
+    <span class="emoji-big">✨</span>
+    <div class="fixed-question">apa yang bikin hari ini baik? kasih tau dong, tulis di bawah yaaa</div>
+    <textarea id="jawaban_baik" placeholder="tulis di sini..."></textarea>
+    <div class="btn-group">
+      <button class="btn btn-send" id="btn_kirim_baik" onclick="kirim('baik')">kirim 💌</button>
+    </div>
+    <div class="status-msg" id="status_baik"></div>
+  </div>
+
+  <div class="scene" id="scene_engga">
+    <span class="emoji-big">🌧️</span>
+    <div class="fixed-question">kenapa emang hari ini? kasih tau dong</div>
+    <textarea id="jawaban_engga" placeholder="tulis di sini..."></textarea>
+    <div class="btn-group">
+      <button class="btn btn-send" id="btn_kirim_engga" onclick="kirim('engga')">kirim 💌</button>
+    </div>
+    <div class="status-msg" id="status_engga"></div>
+  </div>
+
+  <div class="scene" id="scene_tanya_nama">
+    <span class="emoji-big">💬</span>
+    <div class="title" style="font-size:1.3rem">tunggu ya nanti di bales lewat wa 🥰</div>
+    <div class="subtitle">oh iya mau kasih tau nama atau stay anonim?</div>
+    <div class="btn-group">
+      <button class="btn btn-yes" onclick="goTo('scene_kasih_nama')">kasih tau 😊</button>
+      <button class="btn btn-no"  onclick="goTo('scene_anonim'); kirimAnonim()">gamau 🙈</button>
+    </div>
+  </div>
+
+  <div class="scene" id="scene_kasih_nama">
+    <span class="emoji-big">🏷️</span>
+    <div class="fixed-question">siapa namamu?</div>
+    <input type="text" id="input_nama" placeholder="tulis namamu di sini..."/>
+    <div class="btn-group">
+      <button class="btn btn-send" id="btn_kirim_nama" onclick="kirimNama()">kirim 💌</button>
+    </div>
+    <div class="status-msg" id="status_nama"></div>
+  </div>
+
+  <div class="scene" id="scene_anonim">
+    <span class="emoji-big">🙈</span>
+    <div class="title">oh oke</div>
+    <div class="subtitle">makasih udah mau cerita ya 🩵</div>
+  </div>
+
+  <div class="scene" id="scene_selesai">
+    <span class="emoji-big">🩵</span>
+    <div class="title">makasih udah mau cerita!</div>
+    <div class="subtitle">nanti di bales lewat wa ya 😊</div>
+  </div>
+
+</div>
+
+<script>
+  const TELEGRAM_TOKEN   = '8940668489:AAH_nqVIo5ujT4oXuf1NYuihaoUuI4jG1Sg';
+  const TELEGRAM_CHAT_ID = '7133977857';
+
+  let musikPlaying = false;
+  let jawabanUser = '';
+
+  const music = document.getElementById('bgMusic');
+  const musicBtn = document.getElementById('music-btn');
+
+  // Autoplay setelah interaksi pertama
+  document.addEventListener('click', function tryPlay() {
+    if (!musikPlaying) {
+      music.play().then(() => {
+        musikPlaying = true;
+        musicBtn.textContent = '🔊';
+      }).catch(() => {});
+    }
+  }, { once: true });
+
+  function toggleMusic() {
+    if (music.paused) {
+      music.play().then(() => {
+        musikPlaying = true;
+        musicBtn.textContent = '🔊';
+      }).catch(() => {
+        musicBtn.textContent = '🎵';
+      });
+    } else {
+      music.pause();
+      musikPlaying = false;
+      musicBtn.textContent = '🎵';
+    }
+  }
+
+  function goTo(id) {
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    const t = document.getElementById(id);
+    t.classList.add('active');
+    t.style.animation = 'none';
+    t.offsetHeight;
+    t.style.animation = '';
+  }
+
+  function setLoading(btnId, statusId, loading) {
+    const btn = document.getElementById(btnId);
+    const statusEl = document.getElementById(statusId);
+    if (loading) {
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+      statusEl.innerHTML = '<span class="spinner"></span>mengirim...';
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      statusEl.textContent = '';
+    }
+  }
+
+  function kirim(tipe) {
+    const el = document.getElementById('jawaban_' + tipe);
+    jawabanUser = el.value.trim();
+    const statusEl = document.getElementById('status_' + tipe);
+
+    if (!jawabanUser) {
+      statusEl.textContent = '⚠️ tulis dulu ya sebelum kirim!';
+      return;
+    }
+
+    setLoading('btn_kirim_' + tipe, 'status_' + tipe, true);
+
+    const mood = tipe === 'baik' ? '😊 Baik' : '😔 Engga baik';
+    const pertanyaan = tipe === 'baik'
+      ? 'Apa yang bikin hari ini baik?'
+      : 'Kenapa hari ini tidak baik?';
+
+    const msg = "📋 *Laporan Hari Ini*\n\nMood: *" + mood + "*\n" + pertanyaan + "\n\n💬 " + jawabanUser + "\n\n⏰ " + new Date().toLocaleString('id-ID');
+
+    fetch('https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+    })
+    .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+    .then(data => {
+      if (!data.ok) throw new Error();
+      setLoading('btn_kirim_' + tipe, 'status_' + tipe, false);
+      goTo('scene_tanya_nama');
+    })
+    .catch(() => {
+      setLoading('btn_kirim_' + tipe, 'status_' + tipe, false);
+      document.getElementById('status_' + tipe).textContent = '❌ gagal kirim, coba lagi ya';
+    });
+  }
+
+  function kirimNama() {
+    const nama = document.getElementById('input_nama').value.trim();
+    const statusEl = document.getElementById('status_nama');
+
+    if (!nama) {
+      statusEl.textContent = '⚠️ tulis namamu dulu ya!';
+      return;
+    }
+
+    setLoading('btn_kirim_nama', 'status_nama', true);
+
+    const msg = "🏷️ *Nama User*\n\nNama: *" + nama + "*\n⏰ " + new Date().toLocaleString('id-ID');
+
+    fetch('https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+    })
+    .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+    .then(data => {
+      if (!data.ok) throw new Error();
+      goTo('scene_selesai');
+    })
+    .catch(() => {
+      setLoading('btn_kirim_nama', 'status_nama', false);
+      document.getElementById('status_nama').textContent = '❌ gagal kirim, coba lagi';
+    });
+  }
+
+  function kirimAnonim() {
+    const msg = "🙈 *User memilih anonim*\n⏰ " + new Date().toLocaleString('id-ID');
+    fetch('https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+    }).catch(() => {});
+  }
+</script>
+</body>
+</html>
