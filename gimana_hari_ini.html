@@ -152,9 +152,9 @@
 
 <button id="music-btn" onclick="toggleMusic()" title="Play/pause musik">🎵</button>
 
-<!-- JAMINAN SUARA KELUAR: Menggunakan direct link MP3 publik yang stabil & anti-blokir -->
+<!-- DIUBAH KEMBALI: Menggunakan link ID Discord kamu yang benar -->
 <audio id="bgMusic" loop preload="auto">
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"/>
+  <source src="https://cdn.discordapp.com/attachments/1512108143046561982/audio.mp3" type="audio/mpeg"/>
 </audio>
 
 <div class="card">
@@ -232,17 +232,14 @@
   const music = document.getElementById('bgMusic');
   const musicBtn = document.getElementById('music-btn');
 
-  // STRATEGI UTAMA: Musik dipaksa berputar begitu user menyentuh APA PUN di layar web
   document.addEventListener('click', function tryPlay() {
     if (!musikPlaying) {
       music.play().then(() => {
         musikPlaying = true;
         musicBtn.textContent = '🔊';
-      }).catch((err) => {
-        console.log("Autoplay diblokir browser, butuh tombol manual:", err);
-      });
+      }).catch(() => {});
     }
-  }, { once: false }); // Biarkan mendengarkan klik berkali-kali sampai suara aktif
+  }, { once: false });
 
   function toggleMusic() {
     if (music.paused) {
@@ -267,7 +264,6 @@
     t.offsetHeight;
     t.style.animation = '';
     
-    // Paksa musik jalan lagi setiap kali pindah halaman jika browser sempat memblokir
     if(!musikPlaying) {
       music.play().then(() => { musikPlaying = true; musicBtn.textContent = '🔊'; }).catch(()=>{});
     }
@@ -363,3 +359,4 @@
 </script>
 </body>
 </html>
+
