@@ -152,8 +152,9 @@
 
 <button id="music-btn" onclick="toggleMusic()" title="Play/pause musik">🎵</button>
 
+<!-- JAMINAN SUARA KELUAR: Menggunakan direct link MP3 publik yang stabil & anti-blokir -->
 <audio id="bgMusic" loop preload="auto">
-  <source src="https://cdndrive.org/uc?id=18A8ffx2BGl2JldNIjTfXHmbgowiztklC" type="audio/mpeg"/>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"/>
 </audio>
 
 <div class="card">
@@ -231,15 +232,17 @@
   const music = document.getElementById('bgMusic');
   const musicBtn = document.getElementById('music-btn');
 
-  // Autoplay setelah interaksi pertama
+  // STRATEGI UTAMA: Musik dipaksa berputar begitu user menyentuh APA PUN di layar web
   document.addEventListener('click', function tryPlay() {
     if (!musikPlaying) {
       music.play().then(() => {
         musikPlaying = true;
         musicBtn.textContent = '🔊';
-      }).catch(() => {});
+      }).catch((err) => {
+        console.log("Autoplay diblokir browser, butuh tombol manual:", err);
+      });
     }
-  }, { once: true });
+  }, { once: false }); // Biarkan mendengarkan klik berkali-kali sampai suara aktif
 
   function toggleMusic() {
     if (music.paused) {
@@ -263,6 +266,11 @@
     t.style.animation = 'none';
     t.offsetHeight;
     t.style.animation = '';
+    
+    // Paksa musik jalan lagi setiap kali pindah halaman jika browser sempat memblokir
+    if(!musikPlaying) {
+      music.play().then(() => { musikPlaying = true; musicBtn.textContent = '🔊'; }).catch(()=>{});
+    }
   }
 
   function setLoading(btnId, statusId, loading) {
