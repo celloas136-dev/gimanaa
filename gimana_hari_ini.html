@@ -70,8 +70,14 @@
       font-size: 1.1rem;
       font-weight: 800;
       color: white;
-      margin-bottom: 16px;
+      margin-bottom: 6px;
       line-height: 1.6;
+    }
+    .small-hint {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 20px;
+      font-style: italic;
     }
 
     .btn-group { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px; }
@@ -152,7 +158,6 @@
 
 <button id="music-btn" onclick="toggleMusic()" title="Play/pause musik">🎵</button>
 
-<!-- SOLUSI PERMANEN: Memanggil file lagu lokal yang sudah diupload ke GitHub -->
 <audio id="bgMusic" loop preload="auto">
   <source src="bahan1.mp3" type="audio/mpeg"/>
 </audio>
@@ -171,6 +176,7 @@
   <div class="scene" id="scene_baik">
     <span class="emoji-big">✨</span>
     <div class="fixed-question">apa yang bikin hari ini baik? kasih tau dong, tulis di bawah yaaa</div>
+    <div class="small-hint">di isi pelan pelan sambil dengerin lagu nya</div>
     <textarea id="jawaban_baik" placeholder="tulis di sini..."></textarea>
     <div class="btn-group">
       <button class="btn btn-send" id="btn_kirim_baik" onclick="kirim('baik')">kirim 💌</button>
@@ -181,6 +187,7 @@
   <div class="scene" id="scene_engga">
     <span class="emoji-big">🌧️</span>
     <div class="fixed-question">kenapa emang hari ini? kasih tau dong</div>
+    <div class="small-hint">di isi pelan pelan sambil dengerin lagu nya</div>
     <textarea id="jawaban_engga" placeholder="tulis di sini..."></textarea>
     <div class="btn-group">
       <button class="btn btn-send" id="btn_kirim_engga" onclick="kirim('engga')">kirim 💌</button>
